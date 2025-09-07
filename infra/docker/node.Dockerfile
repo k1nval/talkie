@@ -3,7 +3,7 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 FROM base AS deps
-COPY package.json tsconfig.base.json .
+COPY package.json tsconfig.base.json ./
 COPY apps ./apps
 COPY packages ./packages
 RUN corepack enable && yarn --version || true
