@@ -3,9 +3,7 @@ port: 7880
 rtc:
   tcp_port: 7881
   udp_port: 7881
-keys:
-  # This gets replaced by docker compose from your .env file
-  # Do not commit your keys here.
-  ${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}
+# Keys are now passed to the LiveKit container via environment variables
+# in the docker-compose.yml file for better security and flexibility.
 logging:
   level: info
