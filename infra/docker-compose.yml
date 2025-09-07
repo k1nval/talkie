@@ -12,6 +12,8 @@ services:
     expose:
       - "3001"
     restart: unless-stopped
+    networks:
+      - talkie-net
 
   web:
     build:
@@ -24,6 +26,8 @@ services:
     expose:
       - "3000"
     restart: unless-stopped
+    networks:
+      - talkie-net
 
   livekit:
     image: livekit/livekit-server:latest
@@ -36,6 +40,8 @@ services:
     ports:
       - "7881:7881/udp"
     restart: unless-stopped
+    networks:
+      - talkie-net
 
   caddy:
     image: caddy:2.8
@@ -51,3 +57,9 @@ services:
       - "80:80"
       - "443:443"
     restart: unless-stopped
+    networks:
+      - talkie-net
+
+networks:
+  talkie-net:
+    driver: bridge
