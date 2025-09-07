@@ -43,10 +43,6 @@ services:
       - livekit
     env_file:
       - .env
-    environment:
-      - TALKIE_DOMAIN=${TALKIE_DOMAIN}
-      - API_TALKIE_DOMAIN=${API_TALKIE_DOMAIN}
-      - LIVEKIT_TALKIE_DOMAIN=${LIVEKIT_TALKIE_DOMAIN}
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
     ports:
