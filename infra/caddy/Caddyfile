@@ -1,22 +1,22 @@
-# Global options block
-{
-    # Use the Let's Encrypt staging environment to avoid rate limits during testing
-    acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-}
+# # Global options block
+# {
+#     # Use the Let's Encrypt staging environment to avoid rate limits during testing
+#     acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+# }
 
 # Auto HTTPS with Let’s Encrypt
 
 # Web app
 {$TALKIE_DOMAIN} {
-	reverse_proxy web:3000
+reverse_proxy web:3000
 }
 
 # API
 {$API_TALKIE_DOMAIN} {
-	reverse_proxy api:3001
+reverse_proxy api:3001
 }
 
 # LiveKit WS/HTTP
 {$LIVEKIT_TALKIE_DOMAIN} {
-	reverse_proxy livekit:7880
+reverse_proxy livekit:7880
 }
