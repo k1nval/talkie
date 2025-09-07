@@ -106,16 +106,18 @@ export default function Home() {
 }
 
 function MyVideoConference() {
-  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }]).filter((track) => !track.participant.isLocal);
-  if (!tracks.length) {
+  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }])
+  const otherTracks = tracks.filter((track) => !track.participant.isLocal);
+  if (tracks.length === 0) {
     return null;
   }
   return (
     <FocusLayoutContainer>
-      {/* <CarouselLayout tracks={tracks} >
+      <CarouselLayout tracks={tracks} >
         <ParticipantTile />
-      </CarouselLayout> */}
-      <FocusLayout trackRef={tracks[0]} />
+      </CarouselLayout>
+      {otherTracks.length > 0 && (
+        <FocusLayout trackRef={otherTracks[0]} />)}
     </FocusLayoutContainer>
   );
 }
