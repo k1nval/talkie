@@ -17,8 +17,10 @@ services:
     build:
       context: ../
       dockerfile: infra/docker/node-web.Dockerfile
-    environment:
-      - NEXT_PUBLIC_API_URL=https://$API_TALKIE_DOMAIN
+      args:
+        - NEXT_PUBLIC_API_URL=https://${API_TALKIE_DOMAIN}
+    env_file:
+      - .env
     expose:
       - "3000"
     restart: unless-stopped
