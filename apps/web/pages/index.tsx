@@ -70,10 +70,6 @@ function MyVideoConference() {
   ]);
 
   return (
-    <GridLayout>
-      {tracks.map((trackPublication) => (
-        <ParticipantTile key={trackPublication.trackSid} publication={trackPublication} />
-      ))}
-    </GridLayout>
+    <GridLayout tracks={tracks} />
   );
 }
