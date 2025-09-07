@@ -81,21 +81,23 @@ export default function Home() {
       audio={true}
       onDisconnected={onDisconnected}
       data-lk-theme="default"
-      style={{ height: '100vh' }}
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
     >
-      <LayoutContextProvider>
-        <MyVideoConference />
-        <ControlBar
-          controls={{
-            microphone: true,
-            camera: true,
-            screenShare: false, // Disabling screen share for 1:1
-            chat: false, // Disabling chat for now
-            leave: true,
-          }}
-        />
-      </LayoutContextProvider>
-      <RoomAudioRenderer />
+      {/* <div style={{ display: 'flex' }}> */}
+        <LayoutContextProvider >
+          <MyVideoConference />
+          <ControlBar
+            controls={{
+              microphone: true,
+              camera: true,
+              screenShare: false, // Disabling screen share for 1:1
+              chat: false, // Disabling chat for now
+              leave: true,
+            }}
+          />
+        </LayoutContextProvider>
+        <RoomAudioRenderer />
+      {/* </div> */}
     </LiveKitRoom>
   );
 
@@ -103,7 +105,7 @@ export default function Home() {
 }
 
 function MyVideoConference() {
-  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }]).filter((track) => !track.participant.isLocal);
+  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }]).filter((track) => track.participant.isLocal);
   if (!tracks.length) {
     return null;
   }
