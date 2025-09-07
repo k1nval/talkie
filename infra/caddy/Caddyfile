@@ -1,16 +1,16 @@
 # Auto HTTPS with Let’s Encrypt
 
 # Web app
-TALKIE_DOMAIN {
+{$TALKIE_DOMAIN} {
 	reverse_proxy web:3000
 }
 
 # API
-API_TALKIE_DOMAIN {
+{$API_TALKIE_DOMAIN} {
 	reverse_proxy api:3001
 }
 
 # LiveKit WS/HTTP
-LIVEKIT_TALKIE_DOMAIN {
+{$LIVEKIT_TALKIE_DOMAIN} {
 	reverse_proxy livekit:7880
 }
