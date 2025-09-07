@@ -1,3 +1,9 @@
+# Global options block
+{
+    # Use the Let's Encrypt staging environment to avoid rate limits during testing
+    acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
 # Auto HTTPS with Let’s Encrypt
 
 # Web app
