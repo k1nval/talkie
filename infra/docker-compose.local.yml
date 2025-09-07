@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  api:
+    image: node:22-slim
+    command: sh -c "npm install && npm run dev"
+    working_dir: /app/apps/api
+    env_file: .env.local
+    ports:
+      - "3001:3001"
+    volumes:
+      - ../apps/api:/app/apps/api
+      - ../packages:/app/packages
+      - ../package.json:/app/package.json
+      - ../tsconfig.base.json:/app/tsconfig.base.json
+      - api_node_modules:/app/apps/api/node_modules
+    networks:
+      - talkie-net
+
+  web:
+    image: node:22-slim
+    command: sh -c "npm install && npm run dev"
+    working_dir: /app/apps/web
+    env_file: .env.local
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../apps/web:/app/apps/web
+      - ../packages:/app/packages
+      - ../package.json:/app/package.json
+      - ../tsconfig.base.json:/app/tsconfig.base.json
+      - web_node_modules:/app/apps/web/node_modules
+    networks:
+      - talkie-net
+
+  livekit:
+    image: livekit/livekit-server:latest
+    command: [ "--config", "/etc/livekit/livekit.yaml", "--dev" ]
+    env_file: .env.local
+    volumes:
+      - ./livekit/livekit.yaml:/etc/livekit/livekit.yaml:ro
+    ports:
+      - "7880:7880"
+      - "7881:7881/udp"
+    networks:
+      - talkie-net
+
+volumes:
+  api_node_modules:
+  web_node_modules:
+
+
+networks:
+  talkie-net:
+    driver: bridge
