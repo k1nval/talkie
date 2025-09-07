@@ -16,7 +16,7 @@ WORKDIR /app/apps/web
 COPY --from=deps /app/apps/web/node_modules ./node_modules
 COPY apps/web .
 COPY tsconfig.base.json ../../tsconfig.base.json
-RUN npm run build
+RUN echo "Building with NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" && npm run build
 
 # Run Next.js
 FROM node:20-alpine AS runner
