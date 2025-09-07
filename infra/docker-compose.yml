@@ -31,7 +31,7 @@ services:
 
   livekit:
     image: livekit/livekit-server:latest
-    command: ["--config", "/etc/livekit/livekit.yaml"]
+    command: [ "--config", "/etc/livekit/livekit.yaml" ]
     env_file: .env
     environment:
       LIVEKIT_KEYS: '${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}'
@@ -52,16 +52,20 @@ services:
       - web
       - api
       - livekit
-    env_file:
-      - .env
+    env_file: .env
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
     ports:
       - "80:80"
       - "443:443"
     restart: unless-stopped
     networks:
       - talkie-net
+
+volumes:
+  caddy_data:
+
 
 networks:
   talkie-net:

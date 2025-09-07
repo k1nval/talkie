@@ -1,66 +1,84 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LiveKitRoom, GridLayout, ParticipantTile, RoomAudioRenderer, useTracks } from '@livekit/components-react';
+import { useCallback, useState } from 'react';
+import { LiveKitRoom, GridLayout, RoomAudioRenderer, useTracks, ParticipantTile } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 
+// Predefined list of rooms in Russian
+const ROOMS = [
+  'Комната Биккиняевы',
+  'Комната Юновичи',
+];
+
+// Predefined list of funny Russian usernames
+const USERNAMES = [
+  'Хитрый Лис', 'Кудрявый Бобр', 'Веселый Енот', 'Задумчивый Барсук',
+  'Быстрый Заяц', 'Смелый Волк', 'Мудрая Сова', 'Ловкая Белка',
+  'Сонный Медведь', 'Колючий Еж', 'Пушистый Хомяк', 'Гордый Орел',
+  'Поющий Соловей', 'Важный Пингвин', 'Осторожный Олень'
+];
+
 export default function Home() {
-  const [room, setRoom] = useState('talkie-demo');
-  const [name, setName] = useState('guest-' + Math.floor(Math.random() * 1000));
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
 
-  const handleJoin = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleJoin = useCallback(async (roomName: string) => {
+    // Generate a random username from the predefined list
+    const name = USERNAMES[Math.floor(Math.random() * USERNAMES.length)];
+
     const resp = await fetch(process.env.NEXT_PUBLIC_API_URL + '/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ room, name }),
+      body: JSON.stringify({ room: roomName, name: name }),
     });
+
     if (!resp.ok) {
-      alert('Failed to get token');
+      const error = await resp.json();
+      alert(`Failed to get token: ${error.error}`);
       return;
     }
+
     const data = await resp.json();
     setToken(data.token);
     setWsUrl(data.wsUrl);
-  }, [room, name]);
+  }, []);
 
   const onDisconnected = useCallback(() => {
     setToken(null);
   }, []);
 
-  return (
-    <div style={{ padding: 24 }}>
-      {!token || !wsUrl ? (
-        <form onSubmit={handleJoin} style={{ display: 'grid', gap: 8, maxWidth: 360 }}>
-          <h1>Talkie</h1>
-          <label>
-            Room
-            <input value={room} onChange={(e) => setRoom(e.target.value)} required />
-          </label>
-          <label>
-            Name
-            <input value={name} onChange={(e) => setName(e.target.value)} required />
-          </label>
-          <button type="submit">Join</button>
-          <p style={{ fontSize: 12, opacity: 0.7 }}>Set NEXT_PUBLIC_API_URL in web env.</p>
-        </form>
-      ) : (
-        <LiveKitRoom
-          serverUrl={wsUrl}
-          token={token}
-          connect
-          video={true}
-          audio={true}
-          onDisconnected={onDisconnected}
-          data-lk-theme="default"
-          style={{ height: '100vh' }}
-        >
-          <RoomAudioRenderer />
-          <MyVideoConference />
-        </LiveKitRoom>
-      )}
+  const renderLobby = () => (
+    <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center gap-6">
+      <h1 className="text-4xl font-bold">Выберите комнату</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {ROOMS.map((room) => (
+          <button
+            key={room}
+            onClick={() => handleJoin(room)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+          >
+            {room}
+          </button>
+        ))}
+      </div>
     </div>
   );
+
+  const renderRoom = () => (
+     <LiveKitRoom
+        serverUrl={wsUrl!}
+        token={token!}
+        connect
+        video={true}
+        audio={true}
+        onDisconnected={onDisconnected}
+        data-lk-theme="default"
+        style={{ height: '100vh' }}
+      >
+        <RoomAudioRenderer />
+        <MyVideoConference />
+      </LiveKitRoom>
+  );
+
+  return token && wsUrl ? renderRoom() : renderLobby();
 }
 
 function MyVideoConference() {
@@ -70,7 +88,7 @@ function MyVideoConference() {
   ]);
 
   return (
-    <GridLayout tracks={tracks}>
+    <GridLayout tracks={tracks} >
       <ParticipantTile />
     </GridLayout>
   );
