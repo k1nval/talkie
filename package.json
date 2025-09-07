@@ -14,7 +14,7 @@
     "typecheck": "tsc -b"
   },
   "devDependencies": {
-    "prettier": "^3.3.3",
-    "typescript": "^5.4.5"
+    "prettier": "3.3.3",
+    "typescript": "5.5.3"
   }
 }
