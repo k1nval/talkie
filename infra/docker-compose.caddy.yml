@@ -1,0 +1,57 @@
+version: '3.9'
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: infra/docker/node.Dockerfile
+      args:
+        APP_DIR: apps/api
+    environment:
+      - PORT=3001
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
+      - LIVEKIT_WS_URL=${LIVEKIT_WS_URL}
+    expose:
+      - "3001"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../
+      dockerfile: infra/docker/node.Dockerfile
+      args:
+        APP_DIR: apps/web
+    environment:
+      - NEXT_PUBLIC_API_URL=https://$API_TALKIE_DOMAIN
+    expose:
+      - "3000"
+    restart: unless-stopped
+
+  livekit:
+    image: livekit/livekit-server:latest
+    command: ["--config", "/etc/livekit/livekit.yaml", "--dev"]
+    volumes:
+      - ./livekit/livekit.yaml:/etc/livekit/livekit.yaml:ro
+    expose:
+      - "7880"
+      - "7881"
+    ports:
+      - "7881:7881/udp"
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.8
+    depends_on:
+      - web
+      - api
+      - livekit
+    environment:
+      - TALKIE_DOMAIN=${TALKIE_DOMAIN}
+      - API_TALKIE_DOMAIN=${API_TALKIE_DOMAIN}
+      - LIVEKIT_TALKIE_DOMAIN=${LIVEKIT_TALKIE_DOMAIN}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped

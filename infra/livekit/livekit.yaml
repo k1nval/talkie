@@ -1,0 +1,13 @@
+# Minimal LiveKit config
+port: 7880
+rtc:
+  tcp_port: 7881
+  udp_port: 7881
+keys:
+  ${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}
+ws_tls:
+  cert_file: 
+  key_file: 
+# Set external IP/hostname for clients
+# external_ip: YOUR_SERVER_PUBLIC_IP
+# domain: livekit.example.com
