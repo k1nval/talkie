@@ -63,6 +63,7 @@ export default function Home() {
           <button
             key={room}
             onClick={() => handleJoin(room)}
+            style={{ height: '100px', width: '100%', margin: '10px' }}
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105"
           >
             {room}
