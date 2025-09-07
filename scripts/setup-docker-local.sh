@@ -7,12 +7,19 @@ set -euo pipefail
 ENV_FILE="infra/.env.local"
 echo "Writing local environment configuration to ${ENV_FILE}"
 
+# Define the keys here
+API_KEY="LK_DEV_KEY"
+API_SECRET="devsecret"
+
 cat > "${ENV_FILE}" <<EOF
 # .env file for local docker-compose development
 
 # For API & Web containers
-LIVEKIT_API_KEY=LK_DEV_KEY
-LIVEKIT_API_SECRET=devsecret
+LIVEKIT_API_KEY=${API_KEY}
+LIVEKIT_API_SECRET=${API_SECRET}
+
+# For LiveKit Server container (must be in "key: secret" format)
+LIVEKIT_KEYS=${API_KEY}: ${API_SECRET}
 
 # For API container -> tells the API where the LiveKit server is
 LIVEKIT_WS_URL=ws://localhost:7880

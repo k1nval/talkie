@@ -1,5 +1,15 @@
 import { useCallback, useState } from 'react';
-import { LiveKitRoom, GridLayout, RoomAudioRenderer, useTracks, ParticipantTile } from '@livekit/components-react';
+import {
+  LiveKitRoom,
+  RoomAudioRenderer,
+  useTracks,
+  FocusLayout,
+  ControlBar,
+  LayoutContextProvider,
+  FocusLayoutContainer,
+  CarouselLayout,
+  ParticipantTile,
+} from '@livekit/components-react';
 import { Track } from 'livekit-client';
 
 // Predefined list of rooms in Russian
@@ -63,33 +73,46 @@ export default function Home() {
   );
 
   const renderRoom = () => (
-     <LiveKitRoom
-        serverUrl={wsUrl!}
-        token={token!}
-        connect
-        video={true}
-        audio={true}
-        onDisconnected={onDisconnected}
-        data-lk-theme="default"
-        style={{ height: '100vh' }}
-      >
-        <RoomAudioRenderer />
+    <LiveKitRoom
+      serverUrl={wsUrl!}
+      token={token!}
+      connect
+      video={true}
+      audio={true}
+      onDisconnected={onDisconnected}
+      data-lk-theme="default"
+      style={{ height: '100vh' }}
+    >
+      <LayoutContextProvider>
         <MyVideoConference />
-      </LiveKitRoom>
+        <ControlBar
+          controls={{
+            microphone: true,
+            camera: true,
+            screenShare: false, // Disabling screen share for 1:1
+            chat: false, // Disabling chat for now
+            leave: true,
+          }}
+        />
+      </LayoutContextProvider>
+      <RoomAudioRenderer />
+    </LiveKitRoom>
   );
 
   return token && wsUrl ? renderRoom() : renderLobby();
 }
 
 function MyVideoConference() {
-  const tracks = useTracks([
-    { source: Track.Source.Camera, withPlaceholder: true },
-    { source: Track.Source.ScreenShare, withPlaceholder: false },
-  ]);
-
+  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }]).filter((track) => !track.participant.isLocal);
+  if (!tracks.length) {
+    return null;
+  }
   return (
-    <GridLayout tracks={tracks} >
-      <ParticipantTile />
-    </GridLayout>
+    <FocusLayoutContainer>
+      {/* <CarouselLayout tracks={tracks} >
+        <ParticipantTile />
+      </CarouselLayout> */}
+      <FocusLayout trackRef={tracks[0]} />
+    </FocusLayoutContainer>
   );
 }
