@@ -70,6 +70,8 @@ function MyVideoConference() {
   ]);
 
   return (
-    <GridLayout tracks={tracks} />
+    <GridLayout tracks={tracks}>
+      <ParticipantTile />
+    </GridLayout>
   );
 }

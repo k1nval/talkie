@@ -41,6 +41,8 @@ services:
       - web
       - api
       - livekit
+    env_file:
+      - .env
     environment:
       - TALKIE_DOMAIN=${TALKIE_DOMAIN}
       - API_TALKIE_DOMAIN=${API_TALKIE_DOMAIN}
