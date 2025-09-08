@@ -34,6 +34,7 @@ const styles: Record<string, CSSProperties> = {
   },
   focusLayout: {
     padding: '1rem',
+    minHeight: '0',
   },
   participantTile: {
     maxHeight: '200px',
