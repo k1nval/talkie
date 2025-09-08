@@ -79,7 +79,7 @@ export default function RoomPage() {
 }
 
 function MyVideoConference() {
-  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }]);
+  const tracks = useTracks([{ source: Track.Source.Camera }]);
   const otherTracks = tracks.filter((track) => !track.participant.isLocal);
   if (tracks.length === 0) {
     return null;
@@ -89,7 +89,7 @@ function MyVideoConference() {
       <CarouselLayout tracks={tracks}>
         <ParticipantTile />
       </CarouselLayout>
-      {otherTracks.length > 0 && <FocusLayout trackRef={otherTracks[0]} />}
+      {otherTracks.length > 0 && <FocusLayout trackRef={otherTracks[0]} key={otherTracks[0].participant.identity} />}
     </FocusLayoutContainer>
   );
 }

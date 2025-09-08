@@ -78,7 +78,6 @@ app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`);
 });
 async function getNextParticipantName(roomName: string) {
-  return 'Dog';
   const runningRooms = await roomService.listRooms([roomName]);
 
   let participantNames = new Array<string>();

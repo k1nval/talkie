@@ -14,9 +14,6 @@ services:
       - ../package.json:/app/package.json
       - ../tsconfig.base.json:/app/tsconfig.base.json
       - api_node_modules:/app/apps/api/node_modules
-    networks:
-      - talkie-net
-    depends_on: [ livekit ]
 
   web:
     image: node:22-slim
@@ -31,28 +28,19 @@ services:
       - ../package.json:/app/package.json
       - ../tsconfig.base.json:/app/tsconfig.base.json
       - web_node_modules:/app/apps/web/node_modules
-    networks:
-      - talkie-net
 
   livekit:
     image: livekit/livekit-server:latest
-    command: [ "--config", "/etc/livekit/livekit.yaml" ]
-    env_file: .env.local
-    volumes:
-      - ./livekit/livekit.yaml:/etc/livekit/livekit.yaml:ro
+    command: [ "--dev", "--bind=0.0.0.0",]
     expose:
       - "7880"
     ports:
+      - "7880:7880"
       - "7881:7881"
-      - "7881:7881/udp"
-    networks:
-      - talkie-net
+      - "7882:7882/udp"
 
 volumes:
   api_node_modules:
   web_node_modules:
 
 
-networks:
-  talkie-net:
-    driver: bridge
