@@ -8,9 +8,9 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY;
 const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET;
 const LIVEKIT_WS_URL = process.env.LIVEKIT_WS_URL; // e.g., wss://livekit.example.com
-const LIVEKIT_TALKIE_DOMAIN = process.env.LIVEKIT_TALKIE_DOMAIN;
+const LIVEKIT_HOST = process.env.LIVEKIT_HOST;
 
-const roomService = new RoomServiceClient(LIVEKIT_TALKIE_DOMAIN!, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
+const roomService = new RoomServiceClient(LIVEKIT_HOST!, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
 
 const rooms = ['Сюда иди'];
 const names = [
