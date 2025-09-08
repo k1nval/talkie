@@ -2,7 +2,6 @@ import {
   ControlBar,
   CarouselLayout,
   FocusLayout,
-  FocusLayoutContainer,
   LayoutContextProvider,
   LiveKitRoom,
   ParticipantTile,
@@ -11,8 +10,80 @@ import {
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import { TrackReference } from '@livekit/components-core';
+
+const styles: Record<string, CSSProperties> = {
+  container: {
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  videoContainer: {
+    minHeight: '0',
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+  },
+  focusLayoutContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    display: 'flex',
+  },
+  focusLayout: {
+    padding: '1rem',
+  },
+  participantTile: {
+    maxHeight: '200px',
+    maxWidth: '200px',
+  },
+  controlBar: {
+    padding: '1rem',
+  },
+};
+
+interface MyVideoConferenceProps {
+  pinnedTrack: TrackReference | null;
+}
+
+function MyVideoConference({ pinnedTrack }: MyVideoConferenceProps) {
+  const allTracks = useTracks([{ source: Track.Source.Camera }]);
+
+  if (allTracks.length === 0) {
+    return <div>Совсем никого нет</div>;
+  }
+
+  const localTrack = allTracks.find((track) => track.participant.isLocal);
+  const remoteTracks = allTracks.filter((track) => !track.participant.isLocal);
+
+  const focusedTrack = pinnedTrack ?? remoteTracks[0] ?? localTrack;
+
+  const carouselTracks = allTracks.filter(
+    (track) => track.participant.identity !== focusedTrack?.participant.identity,
+  );
+
+  return (
+    <div style={styles.videoContainer}>
+      {focusedTrack && (
+        <div style={styles.focusLayoutContainer}>
+          <FocusLayout
+            data-lk-orientation="portrait"
+            trackRef={focusedTrack}
+            key={focusedTrack.participant.identity}
+            style={styles.focusLayout}
+          />
+        </div>
+      )}
+      {carouselTracks.length > 0 && (
+        <CarouselLayout tracks={carouselTracks}>
+          <ParticipantTile style={styles.participantTile} />
+        </CarouselLayout>
+      )}
+    </div>
+  );
+}
 
 export default function RoomPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -58,10 +129,10 @@ export default function RoomPage() {
       token={token}
       connect
       video={true}
-      audio={false}
+      audio={true}
       onDisconnected={onDisconnected}
       data-lk-theme="default"
-      style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
+      style={styles.container}
     >
       <LayoutContextProvider
         onPinChange={(state) => {
@@ -73,7 +144,7 @@ export default function RoomPage() {
         }}
       >
         <MyVideoConference pinnedTrack={pinnedTrack} />
-        <div style={{ padding: '1rem' }}>
+        <div style={styles.controlBar}>
           <ControlBar
             controls={{
               microphone: true,
@@ -87,33 +158,5 @@ export default function RoomPage() {
       </LayoutContextProvider>
       <RoomAudioRenderer />
     </LiveKitRoom>
-  );
-}
-
-function MyVideoConference({ pinnedTrack }: { pinnedTrack: TrackReference | null }) {
-  const allTracks = useTracks([{ source: Track.Source.Camera }]);
-
-  if (allTracks.length === 0) {
-    return <div>Совсем никого нет</div>;
-  }
-
-  const localTrack = allTracks.find((track) => track.participant.isLocal);
-  const remoteTracks = allTracks.filter((track) => !track.participant.isLocal);
-
-  const focusedTrack = pinnedTrack ?? remoteTracks[0] ?? localTrack;
-
-  const carouselTracks = allTracks.filter(
-    (track) => track.participant.identity !== focusedTrack?.participant.identity,
-  );
-
-  return (
-    <FocusLayoutContainer style={{ flexGrow: 1, padding: '1rem' }}>
-      {focusedTrack && <FocusLayout trackRef={focusedTrack} key={focusedTrack.participant.identity} />}
-      {carouselTracks.length > 0 && (
-        <CarouselLayout tracks={carouselTracks}>
-          <ParticipantTile />
-        </CarouselLayout>
-      )}
-    </FocusLayoutContainer>
   );
 }
