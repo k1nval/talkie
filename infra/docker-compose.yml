@@ -9,6 +9,7 @@ services:
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
       - LIVEKIT_WS_URL=${LIVEKIT_WS_URL}
+      - LIVEKIT_HOST=${LIVEKIT_HOST}
     expose:
       - "3001"
     restart: unless-stopped

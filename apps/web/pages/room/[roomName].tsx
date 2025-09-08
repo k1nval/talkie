@@ -12,10 +12,12 @@ import {
 import { Track } from 'livekit-client';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { TrackReference } from '@livekit/components-core';
 
 export default function RoomPage() {
   const [token, setToken] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
+  const [pinnedTrack, setPinnedTrack] = useState<TrackReference | null>(null);
   const router = useRouter();
   const { roomName } = router.query;
 
@@ -56,13 +58,21 @@ export default function RoomPage() {
       token={token}
       connect
       video={true}
-      audio={true}
+      audio={false}
       onDisconnected={onDisconnected}
       data-lk-theme="default"
       style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
     >
-      <LayoutContextProvider onPinChange={(state) => console.log(state)}>
-        <MyVideoConference />
+      <LayoutContextProvider
+        onPinChange={(state) => {
+          if (state.length > 0) {
+            setPinnedTrack(state[0]);
+          } else {
+            setPinnedTrack(null);
+          }
+        }}
+      >
+        <MyVideoConference pinnedTrack={pinnedTrack} />
         <div style={{ padding: '1rem' }}>
           <ControlBar
             controls={{
@@ -80,22 +90,30 @@ export default function RoomPage() {
   );
 }
 
-function MyVideoConference() {
+function MyVideoConference({ pinnedTrack }: { pinnedTrack: TrackReference | null }) {
   const allTracks = useTracks([{ source: Track.Source.Camera }]);
 
-  const localTracks = allTracks.filter((track) => track.participant.isLocal);
+  if (allTracks.length === 0) {
+    return <div>Совсем никого нет</div>;
+  }
+
+  const localTrack = allTracks.find((track) => track.participant.isLocal);
   const remoteTracks = allTracks.filter((track) => !track.participant.isLocal);
 
-  if (allTracks.length === 0) {
-    return null;
-  }
+  const focusedTrack = pinnedTrack ?? remoteTracks[0] ?? localTrack;
+
+  const carouselTracks = allTracks.filter(
+    (track) => track.participant.identity !== focusedTrack?.participant.identity,
+  );
 
   return (
     <FocusLayoutContainer style={{ flexGrow: 1, padding: '1rem' }}>
-      {remoteTracks.length > 0 && <FocusLayout trackRef={remoteTracks[0]} />}
-      {localTracks.length > 0 && <CarouselLayout tracks={localTracks}>
-        <ParticipantTile />
-      </CarouselLayout>}
+      {focusedTrack && <FocusLayout trackRef={focusedTrack} key={focusedTrack.participant.identity} />}
+      {carouselTracks.length > 0 && (
+        <CarouselLayout tracks={carouselTracks}>
+          <ParticipantTile />
+        </CarouselLayout>
+      )}
     </FocusLayoutContainer>
   );
 }
