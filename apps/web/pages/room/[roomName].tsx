@@ -31,10 +31,12 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     display: 'flex',
+    minHeight: '0',
+    maxHeight: '100%',
   },
   focusLayout: {
     padding: '1rem',
-    minHeight: '0',
+    height: '100%',
   },
   participantTile: {
     maxHeight: '200px',
