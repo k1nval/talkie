@@ -12,8 +12,19 @@ const LIVEKIT_TALKIE_DOMAIN = process.env.LIVEKIT_TALKIE_DOMAIN;
 
 const roomService = new RoomServiceClient(LIVEKIT_TALKIE_DOMAIN!, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
 
-const rooms = ['Living Room', 'Kitchen', 'Bedroom', 'Bathroom', 'Garden'];
-const names = ['Dog', 'Cat', 'Fish', 'Bird', 'Rabbit', 'Hamster', 'Turtle', 'Snake', 'Lizard', 'Frog'];
+const rooms = ['Сюда иди'];
+const names = [
+  'Счастливый Барсук',
+  'Мудрая Сова',
+  'Веселый Лось',
+  'Задумчивый Енот',
+  'Добрый Медведь',
+  'Хитрая Лиса',
+  'Быстрый Заяц',
+  'Важный Волк',
+  'Игривый Бобер',
+  'Спокойный Олень'
+];
 
 if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET || !LIVEKIT_WS_URL) {
   console.error('Missing LIVEKIT env vars. Please set LIVEKIT_API_KEY, LIVEKIT_API_SECRET, LIVEKIT_WS_URL');
