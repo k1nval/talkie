@@ -72,7 +72,7 @@ function MyVideoConference({ pinnedTrack }: MyVideoConferenceProps) {
       {focusedTrack && (
         <div style={styles.focusLayoutContainer}>
           <FocusLayout
-            data-lk-orientation="portrait"
+            className="focused-video"
             trackRef={focusedTrack}
             key={focusedTrack.participant.identity}
             style={styles.focusLayout}

@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+.focused-video .lk-participant-media-video {
+    object-fit: contain;
+}
