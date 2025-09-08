@@ -8,6 +8,7 @@ import {
   ParticipantTile,
   RoomAudioRenderer,
   useTracks,
+  useLocalParticipant,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { useRouter } from 'next/router';
@@ -59,19 +60,21 @@ export default function RoomPage() {
       audio={true}
       onDisconnected={onDisconnected}
       data-lk-theme="default"
-      style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
     >
-      <LayoutContextProvider>
+      <LayoutContextProvider onPinChange={(state) => console.log(state)}>
         <MyVideoConference />
-        <ControlBar
-          controls={{
-            microphone: true,
-            camera: true,
-            screenShare: false, // Disabling screen share for 1:1
-            chat: false, // Disabling chat for now
-            leave: true,
-          }}
-        />
+        <div style={{ padding: '1rem' }}>
+          <ControlBar
+            controls={{
+              microphone: true,
+              camera: true,
+              screenShare: false, // Disabling screen share for 1:1
+              chat: false, // Disabling chat for now
+              leave: true,
+            }}
+          />
+        </div>
       </LayoutContextProvider>
       <RoomAudioRenderer />
     </LiveKitRoom>
@@ -79,17 +82,21 @@ export default function RoomPage() {
 }
 
 function MyVideoConference() {
-  const tracks = useTracks([{ source: Track.Source.Camera }]);
-  const otherTracks = tracks.filter((track) => !track.participant.isLocal);
-  if (tracks.length === 0) {
+  const allTracks = useTracks([{ source: Track.Source.Camera }]);
+
+  const localTracks = allTracks.filter((track) => track.participant.isLocal);
+  const remoteTracks = allTracks.filter((track) => !track.participant.isLocal);
+
+  if (allTracks.length === 0) {
     return null;
   }
+
   return (
-    <FocusLayoutContainer>
-      <CarouselLayout tracks={tracks}>
+    <FocusLayoutContainer style={{ flexGrow: 1, padding: '1rem' }}>
+      {remoteTracks.length > 0 && <FocusLayout trackRef={remoteTracks[0]} />}
+      {localTracks.length > 0 && <CarouselLayout tracks={localTracks}>
         <ParticipantTile />
-      </CarouselLayout>
-      {otherTracks.length > 0 && <FocusLayout trackRef={otherTracks[0]} key={otherTracks[0].participant.identity} />}
+      </CarouselLayout>}
     </FocusLayoutContainer>
   );
 }
