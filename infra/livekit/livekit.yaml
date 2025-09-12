@@ -17,3 +17,4 @@ redis:
 turn:
   enabled: true
   udp_port: 3478
+  domain: turn.talkie.k1nval.com
