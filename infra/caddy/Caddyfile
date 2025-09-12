@@ -20,3 +20,8 @@ reverse_proxy api:3001
 {$LIVEKIT_TALKIE_DOMAIN} {
 reverse_proxy livekit:7880
 }
+
+# Just to trigger a cert for TURN
+turn.talkie.k1nval.com {
+  respond "TURN endpoint" 200
+}
