@@ -29,16 +29,19 @@ services:
       - ../tsconfig.base.json:/app/tsconfig.base.json
       - web_node_modules:/app/apps/web/node_modules
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
   livekit:
     image: livekit/livekit-server:latest
     command: [ "--config", "/etc/livekit/livekit.yaml", "--dev" ]
+    network_mode: "host"
     env_file: .env.local
     volumes:
       - ./livekit/livekit.yaml:/etc/livekit/livekit.yaml:ro
-    ports:
-      - "7880:7880"
-      - "7881:7881/udp"
-      - "3478:3478/udp" # Expose TURN port
+    depends_on:
+      - redis
 
 volumes:
   api_node_modules:

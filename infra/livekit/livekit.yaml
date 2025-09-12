@@ -12,6 +12,10 @@ rtc:
 # in the docker-compose.yml file for better security and flexibility.
 logging:
   level: info
+redis:
+  address: redis:6379
 turn:
   enabled: true
   udp_port: 3478
+  tls_port: 5349
+  domain: turn.talkie.k1nval.com
