@@ -31,13 +31,16 @@ services:
 
   livekit:
     image: livekit/livekit-server:latest
-    command: [ "--dev", "--bind=0.0.0.0",]
-    expose:
-      - "7880"
+    command: ["--config", "/etc/livekit/livekit.yaml", "--dev"]
+    env_file: .env.local
+    volumes:
+      - ./livekit/livekit.yaml:/etc/livekit/livekit.yaml:ro
     ports:
       - "7880:7880"
-      - "7881:7881"
-      - "7882:7882/udp"
+      - "7881:7881/udp"
+      - "3478:3478/udp" # Expose TURN port
+    networks:
+      - talkie-net
 
 volumes:
   api_node_modules:
