@@ -43,6 +43,7 @@ services:
     environment:
       LIVEKIT_KEYS: '${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}'
     volumes:
+      - caddy_data:/data:ro  # ← mount Caddy’s certs read-only into LiveKit
       - ./livekit/livekit.yaml:/etc/livekit/livekit.yaml:ro
     expose:
       - "7880"
@@ -50,6 +51,7 @@ services:
     ports:
       - "7881:7881/udp"
       - "3478:3478/udp" # Expose TURN port
+      - "5349:5349/tcp" # Expose TURN port
     restart: unless-stopped
     depends_on:
       - redis
