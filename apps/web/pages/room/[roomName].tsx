@@ -134,6 +134,7 @@ export default function RoomPage() {
       video={true}
       audio={true}
       onDisconnected={onDisconnected}
+      connectOptions={{ rtcConfig: { iceTransportPolicy: 'relay' } }}
       data-lk-theme="default"
       style={styles.container}
     >
