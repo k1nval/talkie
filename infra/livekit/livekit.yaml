@@ -4,7 +4,7 @@ rtc:
   tcp_port: 7881
   udp_port: 7881
   port_range_start: 50000
-  port_range_end: 60000
+  port_range_end: 50200
   use_external_ip: true
   # This allows the server to discover its own public IP address
   stun_servers:
@@ -20,6 +20,8 @@ turn:
   enabled: true
   udp_port: 3478
   tls_port: 5349
+  relay_range_start: 30000        # narrow TURN relay pool
+  relay_range_end:   30200  
   external_tls: false     # LiveKit will do TLS itself
   domain: turn.talkie.k1nval.com
   cert_file: /data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.crt
