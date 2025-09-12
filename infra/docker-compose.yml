@@ -52,6 +52,8 @@ services:
       - "7881:7881/udp"
       - "3478:3478/udp" # Expose TURN port
       - "5349:5349/tcp" # Expose TURN port
+      - "50000-60000:50000-60000/udp" # SFU media (rtc.port_range_start/end)
+      - "30000-40000:30000-40000/udp" # TURN relay range (your config!)
     restart: unless-stopped
     depends_on:
       - redis
