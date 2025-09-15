@@ -10,6 +10,9 @@ rtc:
   stun_servers:
     - stun.l.google.com:19302
     - stun1.l.google.com:19302
+  ice_servers:
+    - urls:
+        - turns:turn.talkie.k1nval.com:443?transport=tcp
 # Keys are now passed to the LiveKit container via environment variables
 # in the docker-compose.yml file for better security and flexibility.
 logging:

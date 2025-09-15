@@ -49,11 +49,11 @@ services:
       - "7880"
       - "7881"
     ports:
-      - "7881:7881/udp"
-      - "3478:3478/udp" # Expose TURN port
-      - "5349:5349/tcp" # Expose TURN port
-      - "50000-50200:50000-50200/udp" # SFU media (rtc.port_range_start/end)
-      - "30000-30200:30000-30200/udp" # TURN relay range (your config!)
+      - "65.109.242.173:3478:3478/udp" # Expose TURN port
+      - "65.109.242.173:443:5349/tcp" # Expose TURN port
+      - "65.109.242.173:30000-30200:30000-30200/udp" # TURN relay range (your config!)
+      - "46.62.140.249:7881:7881/udp"
+      - "46.62.140.249:50000-50200:50000-50200/udp" # SFU media (rtc.port_range_start/end)
     restart: unless-stopped
     depends_on:
       - redis
@@ -71,8 +71,9 @@ services:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
     ports:
-      - "80:80"
-      - "443:443"
+      - "46.62.140.249:80:80/tcp"
+      - "46.62.140.249:443:443/tcp"
+      - "46.62.140.249:443:443/udp"
     restart: unless-stopped
     networks:
       - talkie-net
