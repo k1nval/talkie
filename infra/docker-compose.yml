@@ -60,23 +60,14 @@ services:
 
   coturn:
     image: coturn/coturn:4.6.2
-    command:
-      - --log-file=stdout
-      - --no-cli
-      - --fingerprint
-      - --listening-ip=0.0.0.0
-      - --realm=turn.talkie.k1nval.com
-      - --server-name=turn.talkie.k1nval.com
-      - --lt-cred-mech
-      # Replace the default secret via TURN_STATIC_AUTH_SECRET in production.
-      - --user=turnuser:turn456
-      - --listening-port=3478
-      - --min-port=29000
-      - --max-port=29200
-      - --tls-listening-port=5349
-      - --external-ip=65.109.242.173
-      - --cert=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.crt
-      - --pkey=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.key
+    command: >
+      sh -c "
+        while ! test -f /data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.crt; do
+          echo 'Waiting for Caddy to issue certificate for turn.talkie.k1nval.com...';
+          sleep 5;
+        done;
+        exec turnserver --log-file=stdout --no-cli --fingerprint --listening-ip=0.0.0.0 --realm=turn.talkie.k1nval.com --server-name=turn.talkie.k1nval.com --lt-cred-mech --user=turnuser:turn456 --listening-port=3478 --min-port=29000 --max-port=29200 --tls-listening-port=5349 --external-ip=65.109.242.173 --cert=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.crt --pkey=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.key
+      "
     volumes:
       - caddy_data:/data:ro
     ports:
