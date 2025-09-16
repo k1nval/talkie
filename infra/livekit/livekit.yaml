@@ -16,7 +16,7 @@ rtc:
     #   credential: talkie-turn-shared-secret
     - host: turn.talkie.k1nval.com
       port: 443
-      transport: tls
+      protocol: tls
       username: talkie-turn-shared-secret
       credential: talkie-turn-shared-secret
 # Keys are now passed to the LiveKit container via environment variables
