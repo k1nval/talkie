@@ -15,12 +15,10 @@ logging:
 redis:
   address: redis:6379
 turn:
-  enabled: true
-  udp_port: 3478
-  tls_port: 443
-  relay_range_start: 29000        # narrow TURN relay pool
-  relay_range_end:   29200  
-  external_tls: false     # LiveKit will do TLS itself
-  domain: turn.talkie.k1nval.com
-  cert_file: /data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.crt
-  key_file:  /data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/turn.talkie.k1nval.com/turn.talkie.k1nval.com.key
+  enabled: false
+  # Must match the TURN static auth secret used by the coturn service.
+  secret: talkie-turn-shared-secret
+  external_servers:
+    - urls:
+      - turn:turn.talkie.k1nval.com:3478?transport=udp
+      - turns:turn.talkie.k1nval.com:443?transport=tcp
