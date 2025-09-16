@@ -60,6 +60,7 @@ services:
 
   coturn:
     image: coturn/coturn:4.6.2
+    user: "root"
     command: ["sh", "/usr/local/bin/coturn-entrypoint.sh"]
     volumes:
       - ./docker/coturn-entrypoint.sh:/usr/local/bin/coturn-entrypoint.sh:ro
