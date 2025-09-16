@@ -15,7 +15,7 @@ rtc:
     #   username: talkie-turn-shared-secret
     #   credential: talkie-turn-shared-secret
     - host: turn.talkie.k1nval.com
-      port: 5349
+      port: 443
       protocol: tls
       username: turnuser
       credential: turn456
