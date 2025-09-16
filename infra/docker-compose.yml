@@ -66,9 +66,9 @@ services:
       - --fingerprint
       - --realm=turn.talkie.k1nval.com
       - --server-name=turn.talkie.k1nval.com
-      - --use-auth-secret
+      - --lt-cred-mech
       # Replace the default secret via TURN_STATIC_AUTH_SECRET in production.
-      - --static-auth-secret=talkie-turn-shared-secret
+      - --user=turnuser:turn456
       - --listening-port=3478
       - --min-port=29000
       - --max-port=29200
