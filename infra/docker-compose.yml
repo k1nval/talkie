@@ -68,7 +68,7 @@ services:
       - --server-name=turn.talkie.k1nval.com
       - --use-auth-secret
       # Replace the default secret via TURN_STATIC_AUTH_SECRET in production.
-      - --static-auth-secret=${TURN_STATIC_AUTH_SECRET:-talkie-turn-shared-secret}
+      - --static-auth-secret=talkie-turn-shared-secret
       - --listening-port=3478
       - --min-port=29000
       - --max-port=29200
