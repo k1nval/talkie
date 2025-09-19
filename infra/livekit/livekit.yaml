@@ -5,8 +5,8 @@ rtc:
   udp_port: 50000-50010
   use_external_ip: true
   stun_servers:
-    - turn.tel.yandex.net
-    - stun.rtc.yandex.net
+    - turn.tel.yandex.net:3478
+    - stun.rtc.yandex.net:3478
     - turn.talkie.k1nval.com:3478
   turn_servers:
     - host: turn.talkie.k1nval.com
