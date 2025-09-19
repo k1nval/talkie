@@ -17,8 +17,8 @@ rtc:
     - host: turn.talkie.k1nval.com
       port: 443
       protocol: tls
-      username: turnuser
-      credential: turn456
+      # username: turnuser
+      # credential: turn456
 # Keys are now passed to the LiveKit container via environment variables
 # in the docker-compose.yml file for better security and flexibility.
 logging:
