@@ -1,9 +1,10 @@
 # Minimal LiveKit config
 port: 7880
 rtc:
-  tcp_port: 7881
-  udp_port: 50000-50200
-  use_external_ip: true
+  # tcp_port: 7881
+  # port_range_start: 50000
+  # port_range_end: 50200
+  # use_external_ip: true
   # This allows the server to discover its own public IP address
   # stun_servers:
   #   - coturn:3478
