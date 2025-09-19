@@ -32,4 +32,6 @@ exec turnserver \
   --tls-listening-port=443 \
   --external-ip=65.109.242.173 \
   --cert="${CERT_FILE}" \
-  --pkey="${KEY_FILE}"
+  --pkey="${KEY_FILE}" \
+  --no-udp-relay \
+  --no-udp
