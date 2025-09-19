@@ -4,21 +4,12 @@ rtc:
   tcp_port: 7881
   udp_port: 50000-50010
   use_external_ip: true
-  # This allows the server to discover its own public IP address
-  # stun_servers:
-  #   - stun.l.google.com:19302
-  #   - stun1.l.google.com:19302
-  turn_servers:
-    # - host: turn.talkie.k1nval.com
-    #   port: 3478
-    #   transport: udp
-    #   username: talkie-turn-shared-secret
-    #   credential: talkie-turn-shared-secret
-    - host: turn.talkie.k1nval.com
-      port: 443
-      protocol: tls
-      username: turnuser
-      credential: turn456
+  # turn_servers:
+  #   - host: turn.talkie.k1nval.com
+  #     port: 443
+  #     protocol: tls
+  #     username: turnuser
+  #     credential: turn456
 # Keys are now passed to the LiveKit container via environment variables
 # in the docker-compose.yml file for better security and flexibility.
 logging:
