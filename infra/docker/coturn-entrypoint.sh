@@ -21,6 +21,7 @@ exec turnserver \
   --log-file=stdout \
   --no-cli \
   --fingerprint \
+  --listening-ip=0.0.0.0 \
   --realm=turn.talkie.k1nval.com \
   --server-name=turn.talkie.k1nval.com \
   --lt-cred-mech \
