@@ -23,9 +23,8 @@ exec turnserver \
   --fingerprint \
   --realm=turn.talkie.k1nval.com \
   --server-name=turn.talkie.k1nval.com \
-  --lt-cred-mech \
   --use-auth-secret \
-  --static-auth-secret="${LIVEKIT_API_SECRET}" \
+  --static-auth-secret=${LIVEKIT_API_SECRET} \
   --listening-port=3478 \
   --min-port=29000 \
   --max-port=29200 \
