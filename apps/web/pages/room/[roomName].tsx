@@ -134,18 +134,6 @@ export default function RoomPage() {
       video={true}
       audio={true}
       onDisconnected={onDisconnected}
-      connectOptions={{
-        rtcConfig: {
-          // iceTransportPolicy: 'relay',
-          iceServers: [
-            {
-              urls: 'turns:turn.talkie.k1nval.com:443?transport=tcp',
-              username: 'turnuser',
-              credential: 'turn456',
-            },
-          ],
-        }
-      }}
       data-lk-theme="default"
       style={styles.container}
     >
