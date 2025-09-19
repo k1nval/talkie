@@ -5,7 +5,7 @@ rtc:
   udp_port: 50000-50010
   use_external_ip: true
   stun_servers:
-    - stun:turn.talkie.k1nval.com:3478
+    - turn.talkie.k1nval.com:3478
   turn_servers:
     - host: turn.talkie.k1nval.com
       port: 443
