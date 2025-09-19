@@ -21,7 +21,7 @@ exec turnserver \
   --log-file=stdout \
   --no-cli \
   --fingerprint \
-  --listening-ip=0.0.0.0 \
+  --listening-ip=coturn \
   --realm=turn.talkie.k1nval.com \
   --server-name=turn.talkie.k1nval.com \
   --lt-cred-mech \
@@ -30,7 +30,7 @@ exec turnserver \
   --min-port=29000 \
   --max-port=29200 \
   --tls-listening-port=443 \
-  --relay-ip=65.109.242.173 \
+  --relay-ip=coturn \
   --external-ip=65.109.242.173 \
   --cert="${CERT_FILE}" \
   --pkey="${KEY_FILE}"
