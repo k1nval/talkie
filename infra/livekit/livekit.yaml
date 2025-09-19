@@ -11,11 +11,11 @@ rtc:
     # - stun.rtc.yandex.net:3478
     # - turn.talkie.k1nval.com:3478
   turn_servers:
-    - host: turn.talkie.k1nval.com
-      port: 3478
-      protocol: udp
-      username: turnuser
-      credential: turn456
+    # - host: turn.talkie.k1nval.com
+    #   port: 3478
+    #   protocol: udp
+    #   username: turnuser
+    #   credential: turn456
     - host: turn.talkie.k1nval.com
       port: 443
       protocol: tcp
