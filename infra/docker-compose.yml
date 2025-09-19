@@ -51,7 +51,7 @@ services:
       - "46.62.140.249:7880:7880/tcp"
       - "46.62.140.249:7881:7881/tcp"
       - "46.62.140.249:7881:7881/udp"
-      - "65.109.242.173:50000-50200:50000-50200/udp" # SFU media (rtc.port_range_start/end)
+      - "46.62.140.249:50000-50200:50000-50200/udp" # SFU media (rtc.port_range_start/end)
     restart: unless-stopped
     depends_on:
       - redis
