@@ -4,6 +4,10 @@ rtc:
   tcp_port: 7881
   udp_port: 50000-50010
   use_external_ip: true
+  stun_servers:
+    - stun:turn.tel.yandex.net
+    - stun:stun.rtc.yandex.net
+    - stun:turn.talkie.k1nval.com:3478
   turn_servers:
     - host: turn.talkie.k1nval.com
       port: 443
