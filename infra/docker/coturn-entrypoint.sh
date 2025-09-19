@@ -21,7 +21,6 @@ exec turnserver \
   --log-file=stdout \
   --no-cli \
   --fingerprint \
-  --listening-ip=0.0.0.0 \
   --realm=turn.talkie.k1nval.com \
   --server-name=turn.talkie.k1nval.com \
   --lt-cred-mech \
@@ -32,5 +31,4 @@ exec turnserver \
   --tls-listening-port=443 \
   --external-ip=65.109.242.173 \
   --cert="${CERT_FILE}" \
-  --pkey="${KEY_FILE}" \
-  --no-udp
+  --pkey="${KEY_FILE}"
