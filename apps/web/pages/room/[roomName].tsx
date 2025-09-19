@@ -136,10 +136,10 @@ export default function RoomPage() {
       onDisconnected={onDisconnected}
       connectOptions={{
         rtcConfig: {
-          iceTransportPolicy: 'relay',
+          // iceTransportPolicy: 'relay',
           iceServers: [
             {
-              urls: 'turn:turn.talkie.k1nval.com:443?transport=tcp',
+              urls: 'turns:turn.talkie.k1nval.com:443?transport=tcp',
               username: 'turnuser',
               credential: 'turn456',
             },
