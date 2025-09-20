@@ -6,10 +6,10 @@ rtc:
   port_range_end: 50200
   use_external_ip: true
   # This allows the server to discover its own public IP address
-  # stun_servers:
+  stun_servers:
   #   - coturn:3478
     # - stun.rtc.yandex.net:3478
-    # - turn.talkie.k1nval.com:3478
+    - turn.talkie.k1nval.com:3478
   turn_servers:
     # - host: turn.talkie.k1nval.com
     #   port: 3478
