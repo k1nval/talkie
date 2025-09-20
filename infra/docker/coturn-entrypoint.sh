@@ -21,7 +21,7 @@ exec turnserver \
   --log-file=stdout \
   --no-cli \
   --fingerprint \
-  --listening-ip=65.109.242.173 \
+  --listening-ip=0.0.0.0 \
   --relay-ip=65.109.242.173 \
   --realm=turn.talkie.k1nval.com \
   --server-name=turn.talkie.k1nval.com \
