@@ -72,8 +72,8 @@ services:
       # TURN over TLS on 443 (coturn must listen there)
       - "65.109.242.173:443:443/tcp"
       # Relay UDP range – MUST be reachable from LiveKit
-      - "65.109.242.173:29000-29200:29000-29200/udp"
-      - "65.109.242.173:29000-29200:29000-29200/tcp"
+      # - "65.109.242.173:29000-29200:29000-29200/udp"
+      # - "65.109.242.173:29000-29200:29000-29200/tcp"
     restart: unless-stopped
     depends_on:
       - caddy
