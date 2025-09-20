@@ -70,7 +70,7 @@ services:
       - "65.109.242.173:3478:3478/udp"
       - "65.109.242.173:3478:3478/tcp"
       # TURN over TLS on 443 (coturn must listen there)
-      # - "65.109.242.173:443:443/tcp"
+      - "65.109.242.173:443:443/tcp"
       # Relay UDP range – MUST be reachable from LiveKit
       - "65.109.242.173:29000-29200:29000-29200/udp"
       - "65.109.242.173:29000-29200:29000-29200/tcp"
@@ -93,7 +93,6 @@ services:
     ports:
       - "46.62.140.249:80:80/tcp"
       - "65.109.242.173:80:80/tcp" # Allow Caddy to solve ACME for the TURN domain
-      - "65.109.242.173:443:443/tcp" # Allow Caddy to solve ACME for the TURN domain
       - "46.62.140.249:443:443/tcp"
       - "46.62.140.249:443:443/udp"
     restart: unless-stopped
