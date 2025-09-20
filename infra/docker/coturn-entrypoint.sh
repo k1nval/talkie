@@ -21,7 +21,8 @@ exec turnserver \
   --log-file=stdout \
   --no-cli \
   --fingerprint \
-  --listening-ip=0.0.0.0 \
+  --listening-ip=65.109.242.173 \
+  --relay-ip=65.109.242.173 \
   --realm=turn.talkie.k1nval.com \
   --server-name=turn.talkie.k1nval.com \
   --lt-cred-mech \
@@ -29,7 +30,6 @@ exec turnserver \
   --listening-port=3478 \
   --min-port=29000 \
   --max-port=29200 \
-  --tls-listening-port=5349 \
-  --external-ip=65.109.242.173 \
+  --tls-listening-port=443 \
   --cert="${CERT_FILE}" \
   --pkey="${KEY_FILE}"
