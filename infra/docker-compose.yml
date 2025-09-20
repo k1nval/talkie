@@ -58,28 +58,6 @@ services:
     networks:
       - talkie-net
 
-  coturn:
-    image: coturn/coturn:4.6.2
-    user: "root"
-    command: ["sh", "/usr/local/bin/coturn-entrypoint.sh"]
-    volumes:
-      - ./docker/coturn-entrypoint.sh:/usr/local/bin/coturn-entrypoint.sh:ro
-      - caddy_data:/data:ro
-    ports:
-      # STUN/TURN
-      - "65.109.242.173:3478:3478/udp"
-      - "65.109.242.173:3478:3478/tcp"
-      # TURN over TLS on 443 (coturn must listen there)
-      - "65.109.242.173:443:443/tcp"
-      # Relay UDP range – MUST be reachable from LiveKit
-      - "65.109.242.173:29000-29200:29000-29200/udp"
-      - "65.109.242.173:29000-29200:29000-29200/tcp"
-    restart: unless-stopped
-    depends_on:
-      - caddy
-    networks:
-      - talkie-net
-
   caddy:
     image: caddy:2.8
     depends_on:
@@ -92,7 +70,6 @@ services:
       - caddy_data:/data
     ports:
       - "46.62.140.249:80:80/tcp"
-      - "65.109.242.173:80:80/tcp" # Allow Caddy to solve ACME for the TURN domain
       - "46.62.140.249:443:443/tcp"
       - "46.62.140.249:443:443/udp"
     restart: unless-stopped

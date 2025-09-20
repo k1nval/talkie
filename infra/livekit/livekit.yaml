@@ -18,11 +18,6 @@ rtc:
     #   credential: turn456
     - host: turn.talkie.k1nval.com
       port: 443
-      protocol: tcp
-      username: turnuser
-      credential: turn456
-    - host: turn.talkie.k1nval.com
-      port: 443
       protocol: tls
       username: turnuser
       credential: turn456
