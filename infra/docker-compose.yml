@@ -81,6 +81,7 @@ services:
 
 volumes:
   caddy_data:
+  next_build:
 
 
 networks:
