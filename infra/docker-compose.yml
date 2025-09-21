@@ -68,6 +68,7 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
+      - ./myapp/.next:/srv/app/.next
     ports:
       - "46.62.140.249:80:80/tcp"
       - "46.62.140.249:443:443/tcp"
