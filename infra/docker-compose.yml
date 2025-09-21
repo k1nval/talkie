@@ -22,8 +22,6 @@ services:
       dockerfile: infra/docker/node-web.Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=https://${API_TALKIE_DOMAIN}
-    volumes:
-      - ./myapp:/app
     env_file:
       - .env
     expose:
