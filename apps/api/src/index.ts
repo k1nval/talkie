@@ -50,9 +50,6 @@ app.get('/rooms', (_req, res) => {
 
 app.post('/rooms/:roomName/join', async (req, res) => {
   const { roomName } = req.params;
-  if (!rooms.includes(roomName)) {
-    return res.status(404).json({ error: 'Room not found' });
-  }
 
   const parse = JoinRoomRequestSchema.safeParse(req.body);
   if (!parse.success) {
