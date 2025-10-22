@@ -22,8 +22,6 @@ services:
       dockerfile: infra/docker/node-web.Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=https://${API_TALKIE_DOMAIN}
-    volumes:
-      - next_build:/app/.next            # <— writes build here
     env_file:
       - .env
     expose:
@@ -70,7 +68,6 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
-      - next_build:/srv/app/.next:ro
     ports:
       - "46.62.140.249:80:80/tcp"
       - "46.62.140.249:443:443/tcp"
@@ -81,7 +78,6 @@ services:
 
 volumes:
   caddy_data:
-  next_build:
 
 
 networks:
