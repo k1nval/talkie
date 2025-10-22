@@ -19,6 +19,7 @@ import { GainAudioProcessor } from '../../lib/audio/GainAudioProcessor';
 
 type RoomType = 'Video' | 'Audio';
 
+// Inline style map keeps the layout definitions close to the component logic.
 const styles: Record<string, CSSProperties> = {
   container: {
     height: '100vh',
@@ -63,6 +64,7 @@ interface MyVideoConferenceProps {
 }
 
 function MyVideoConference({ pinnedTrack }: MyVideoConferenceProps) {
+  // Pull in every camera track so we can choose who to spotlight.
   const allTracks = useTracks([{ source: Track.Source.Camera }]);
 
   if (allTracks.length === 0) {
@@ -72,8 +74,10 @@ function MyVideoConference({ pinnedTrack }: MyVideoConferenceProps) {
   const localTrack = allTracks.find((track) => track.participant.isLocal);
   const remoteTracks = allTracks.filter((track) => !track.participant.isLocal);
 
+  // Prefer the pinned track, otherwise show a remote participant, or fall back to ourselves.
   const focusedTrack = pinnedTrack ?? remoteTracks[0] ?? localTrack;
 
+  // Anything not currently focused still shows up in the carousel.
   const carouselTracks = allTracks.filter(
     (track) => track.participant.identity !== focusedTrack?.participant.identity,
   );
@@ -114,6 +118,7 @@ function AudioRoomView({
 }: AudioRoomViewProps) {
   const participants = useParticipants();
   const { microphoneTrack } = useLocalParticipant();
+  // LiveKit hook gives us the available audio input devices and lets us switch between them.
   const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({ kind: 'audioinput' });
   const [inputVolume, setInputVolume] = useState(1);
   const volumeRef = useRef(inputVolume);
@@ -122,11 +127,13 @@ function AudioRoomView({
   const noiseCancellationTrackRef = useRef<LocalAudioTrack | null>(null);
   const appliedNoiseCancellationRef = useRef<boolean | null>(null);
 
+  // Whenever the slider moves we update the processor immediately.
   useEffect(() => {
     volumeRef.current = inputVolume;
     processorRef.current?.setGain(inputVolume);
   }, [inputVolume]);
 
+  // Attach (or reattach) our custom GainAudioProcessor to the current microphone track.
   useEffect(() => {
     const track = (microphoneTrack?.track as LocalAudioTrack) ?? null;
 
@@ -164,6 +171,7 @@ function AudioRoomView({
     };
   }, [microphoneTrack?.track]);
 
+  // Restart the browser's capture pipeline if the noise cancellation toggle changes.
   useEffect(() => {
     const track = (microphoneTrack?.track as LocalAudioTrack) ?? null;
 
@@ -205,6 +213,7 @@ function AudioRoomView({
   }, [microphoneTrack?.track, noiseCancellationEnabled]);
 
   const sortedParticipants = useMemo(() => {
+    // Keep the local user at the top and the rest sorted alphabetically for readability.
     return [...participants].sort((a, b) => {
       if (a.isLocal === b.isLocal) {
         return a.identity.localeCompare(b.identity);
@@ -355,6 +364,7 @@ export default function RoomPage() {
 
   const normalizedRoomName = typeof roomName === 'string' ? roomName : roomName?.[0];
 
+  // Memoize the capture options so the LiveKitRoom only reconnects when settings change.
   const audioCaptureOptions = useMemo(
     () => ({
       noiseSuppression: noiseCancellationEnabled,
@@ -367,6 +377,7 @@ export default function RoomPage() {
   useEffect(() => {
     if (!normalizedRoomName) return;
 
+    // Grab a LiveKit access token for this room and remember the type so we render the right UI.
     const joinRoom = async () => {
       const resp = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/rooms/${encodeURIComponent(normalizedRoomName)}/join`,
@@ -416,6 +427,7 @@ export default function RoomPage() {
       token={token}
       connect
       video={roomType === 'Video'}
+      // Passing an object here lets us enable or disable browser noise suppression.
       audio={audioCaptureOptions}
       onDisconnected={onDisconnected}
       data-lk-theme="default"
@@ -437,8 +449,8 @@ export default function RoomPage() {
               controls={{
                 microphone: true,
                 camera: true,
-                screenShare: false, // Disabling screen share for 1:1
-                chat: false, // Disabling chat for now
+                screenShare: false, // Screen share is off to keep the layout simple for now.
+                chat: false, // Chat is disabled until we build a dedicated experience.
                 leave: true,
               }}
             />

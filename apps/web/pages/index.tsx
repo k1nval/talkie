@@ -13,12 +13,14 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
+    // Load the available rooms once on mount so the lobby shows up-to-date options.
     fetch(process.env.NEXT_PUBLIC_API_URL + '/rooms')
       .then((res) => res.json())
       .then((data) => setRooms(data.rooms));
   }, []);
 
   const handleJoin = (room: RoomSummary) => {
+    // Encode the room name so we can safely use it inside the URL.
     router.push(`/room/${encodeURIComponent(room.name)}`);
   };
 

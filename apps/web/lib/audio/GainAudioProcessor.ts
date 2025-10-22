@@ -1,5 +1,7 @@
 import type { AudioProcessorOptions, TrackProcessor, Track } from 'livekit-client';
 
+// This processor wraps the outgoing microphone track in a GainNode so we can
+// adjust the input volume before LiveKit sends it to other participants.
 export class GainAudioProcessor implements TrackProcessor<Track.Kind.Audio, AudioProcessorOptions> {
   name = 'gain-audio-processor';
 
@@ -15,11 +17,13 @@ export class GainAudioProcessor implements TrackProcessor<Track.Kind.Audio, Audi
     this.gainValue = initialGain;
   }
 
+  // LiveKit calls init when the processor is first attached to a track.
   async init(options: AudioProcessorOptions) {
     this.context = options.audioContext;
     this.setupNodes(options.track);
   }
 
+  // restart runs whenever LiveKit swaps out the source track (e.g. device change).
   async restart(options: AudioProcessorOptions) {
     this.teardown();
     this.context = options.audioContext;
@@ -30,6 +34,7 @@ export class GainAudioProcessor implements TrackProcessor<Track.Kind.Audio, Audi
     this.teardown();
   }
 
+  // Update the gain value both in state and on the active GainNode.
   setGain(gain: number) {
     this.gainValue = gain;
     if (this.gainNode) {
@@ -37,6 +42,7 @@ export class GainAudioProcessor implements TrackProcessor<Track.Kind.Audio, Audi
     }
   }
 
+  // Wire up the Web Audio graph that feeds the adjusted track back to LiveKit.
   private setupNodes(track: MediaStreamTrack) {
     if (!this.context) {
       return;
@@ -56,6 +62,7 @@ export class GainAudioProcessor implements TrackProcessor<Track.Kind.Audio, Audi
     }
   }
 
+  // Clean up any nodes we created so the audio graph doesn't leak resources.
   private teardown() {
     this.source?.disconnect();
     this.gainNode?.disconnect();
