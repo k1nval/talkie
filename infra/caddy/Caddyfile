@@ -16,12 +16,6 @@
 {$TALKIE_DOMAIN} {
     encode gzip
 
-    handle_path /_next/static/* {
-        root * /srv/app/.next/static
-        file_server
-        header Cache-Control "public, max-age=31536000, immutable"
-    }
-
     reverse_proxy web:3000
 
     # Access log for this site
