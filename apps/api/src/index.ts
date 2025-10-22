@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { z } from 'zod';
-import { AccessToken, ParticipantInfo, RoomServiceClient } from 'livekit-server-sdk';
+import { AccessToken, RoomServiceClient } from 'livekit-server-sdk';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY;
@@ -12,7 +12,17 @@ const LIVEKIT_HOST = process.env.LIVEKIT_HOST;
 
 const roomService = new RoomServiceClient(LIVEKIT_HOST!, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
 
-const rooms = ['Сюда иди'];
+type RoomType = 'Video' | 'Audio';
+
+interface RoomDefinition {
+  name: string;
+  type: RoomType;
+}
+
+const rooms: RoomDefinition[] = [
+  { name: 'Сюда иди', type: 'Video' },
+  { name: 'Голосовой круг', type: 'Audio' },
+];
 const names = [
   'Счастливый Барсук',
   'Мудрая Сова',
@@ -51,6 +61,11 @@ app.get('/rooms', (_req, res) => {
 app.post('/rooms/:roomName/join', async (req, res) => {
   const { roomName } = req.params;
 
+  const room = rooms.find((r) => r.name === roomName);
+  if (!room) {
+    return res.status(404).json({ error: 'Room not found' });
+  }
+
   const parse = JoinRoomRequestSchema.safeParse(req.body);
   if (!parse.success) {
     return res.status(400).json({ error: 'Invalid payload', details: parse.error.flatten() });
@@ -75,7 +90,7 @@ app.post('/rooms/:roomName/join', async (req, res) => {
     });
 
     const token = await at.toJwt();
-    res.json({ token, wsUrl: LIVEKIT_WS_URL, name });
+    res.json({ token, wsUrl: LIVEKIT_WS_URL, name, type: room.type });
   } catch (e) {
     console.error('Error creating token', e);
     res.status(500).json({ error: 'Failed to create token' });

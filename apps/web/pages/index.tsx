@@ -1,8 +1,15 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+type RoomType = 'Video' | 'Audio';
+
+interface RoomSummary {
+  name: string;
+  type: RoomType;
+}
+
 export default function Home() {
-  const [rooms, setRooms] = useState<string[]>([]);
+  const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -11,8 +18,8 @@ export default function Home() {
       .then((data) => setRooms(data.rooms));
   }, []);
 
-  const handleJoin = (roomName: string) => {
-    router.push(`/room/${encodeURIComponent(roomName)}`);
+  const handleJoin = (room: RoomSummary) => {
+    router.push(`/room/${encodeURIComponent(room.name)}`);
   };
 
   return (
@@ -21,12 +28,13 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {rooms.map((room) => (
           <button
-            key={room}
+            key={room.name}
             onClick={() => handleJoin(room)}
             style={{ height: '100px', width: '100%', margin: '10px' }}
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105"
           >
-            {room}
+            <div className="text-lg font-semibold">{room.name}</div>
+            <div className="text-sm text-blue-100 mt-1">{room.type === 'Audio' ? 'Аудио' : 'Видео'}</div>
           </button>
         ))}
       </div>
