@@ -102,9 +102,16 @@ function MyVideoConference({ pinnedTrack }: MyVideoConferenceProps) {
 interface AudioRoomViewProps {
   roomName: string;
   participantName: string | null;
+  noiseCancellationEnabled: boolean;
+  onNoiseCancellationToggle: (enabled: boolean) => void;
 }
 
-function AudioRoomView({ roomName, participantName }: AudioRoomViewProps) {
+function AudioRoomView({
+  roomName,
+  participantName,
+  noiseCancellationEnabled,
+  onNoiseCancellationToggle,
+}: AudioRoomViewProps) {
   const participants = useParticipants();
   const { microphoneTrack } = useLocalParticipant();
   const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({ kind: 'audioinput' });
@@ -112,6 +119,8 @@ function AudioRoomView({ roomName, participantName }: AudioRoomViewProps) {
   const volumeRef = useRef(inputVolume);
   const processorRef = useRef<GainAudioProcessor | null>(null);
   const appliedTrackRef = useRef<LocalAudioTrack | null>(null);
+  const noiseCancellationTrackRef = useRef<LocalAudioTrack | null>(null);
+  const appliedNoiseCancellationRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     volumeRef.current = inputVolume;
@@ -155,6 +164,46 @@ function AudioRoomView({ roomName, participantName }: AudioRoomViewProps) {
     };
   }, [microphoneTrack?.track]);
 
+  useEffect(() => {
+    const track = (microphoneTrack?.track as LocalAudioTrack) ?? null;
+
+    if (noiseCancellationTrackRef.current !== track) {
+      noiseCancellationTrackRef.current = track;
+      appliedNoiseCancellationRef.current = null;
+    }
+
+    if (!track) {
+      return;
+    }
+
+    if (appliedNoiseCancellationRef.current === noiseCancellationEnabled) {
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        await track.restartTrack({
+          noiseSuppression: noiseCancellationEnabled,
+          autoGainControl: noiseCancellationEnabled,
+          echoCancellation: true,
+        });
+        if (!cancelled) {
+          appliedNoiseCancellationRef.current = noiseCancellationEnabled;
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('Failed to update noise cancellation', error);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [microphoneTrack?.track, noiseCancellationEnabled]);
+
   const sortedParticipants = useMemo(() => {
     return [...participants].sort((a, b) => {
       if (a.isLocal === b.isLocal) {
@@ -178,6 +227,10 @@ function AudioRoomView({ roomName, participantName }: AudioRoomViewProps) {
 
   const handleVolumeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputVolume(Number(event.target.value));
+  };
+
+  const handleNoiseCancellationChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onNoiseCancellationToggle(event.target.checked);
   };
 
   const participantCount = participants.length;
@@ -216,6 +269,31 @@ function AudioRoomView({ roomName, participantName }: AudioRoomViewProps) {
           )}
         </div>
         <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-200">Шумоподавление</h3>
+              <p className="text-xs text-gray-400">Использует встроенную фильтрацию браузера.</p>
+            </div>
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={noiseCancellationEnabled}
+                onChange={handleNoiseCancellationChange}
+              />
+              <span
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  noiseCancellationEnabled ? 'bg-blue-500' : 'bg-gray-600'
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    noiseCancellationEnabled ? 'translate-x-5' : 'translate-x-1'
+                  }`}
+                />
+              </span>
+            </label>
+          </div>
           <div>
             <label className="flex items-center justify-between text-sm font-medium text-gray-200">
               <span>Громкость микрофона</span>
@@ -271,10 +349,20 @@ export default function RoomPage() {
   const [roomType, setRoomType] = useState<RoomType | null>(null);
   const [participantName, setParticipantName] = useState<string | null>(null);
   const [pinnedTrack, setPinnedTrack] = useState<TrackReference | null>(null);
+  const [noiseCancellationEnabled, setNoiseCancellationEnabled] = useState(true);
   const router = useRouter();
   const { roomName } = router.query;
 
   const normalizedRoomName = typeof roomName === 'string' ? roomName : roomName?.[0];
+
+  const audioCaptureOptions = useMemo(
+    () => ({
+      noiseSuppression: noiseCancellationEnabled,
+      autoGainControl: noiseCancellationEnabled,
+      echoCancellation: true,
+    }),
+    [noiseCancellationEnabled],
+  );
 
   useEffect(() => {
     if (!normalizedRoomName) return;
@@ -328,7 +416,7 @@ export default function RoomPage() {
       token={token}
       connect
       video={roomType === 'Video'}
-      audio={true}
+      audio={audioCaptureOptions}
       onDisconnected={onDisconnected}
       data-lk-theme="default"
       style={roomType === 'Video' ? styles.container : styles.audioContainer}
@@ -357,7 +445,12 @@ export default function RoomPage() {
           </div>
         </LayoutContextProvider>
       ) : (
-        <AudioRoomView roomName={normalizedRoomName} participantName={participantName} />
+        <AudioRoomView
+          roomName={normalizedRoomName}
+          participantName={participantName}
+          noiseCancellationEnabled={noiseCancellationEnabled}
+          onNoiseCancellationToggle={(enabled) => setNoiseCancellationEnabled(enabled)}
+        />
       )}
       <RoomAudioRenderer />
     </LiveKitRoom>
