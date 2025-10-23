@@ -196,6 +196,7 @@ function AudioRoomView({
           noiseSuppression: noiseCancellationEnabled,
           autoGainControl: noiseCancellationEnabled,
           echoCancellation: true,
+          processor: processorRef.current,
         });
         if (!cancelled) {
           appliedNoiseCancellationRef.current = noiseCancellationEnabled;
