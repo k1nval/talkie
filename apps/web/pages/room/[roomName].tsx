@@ -195,8 +195,7 @@ function AudioRoomView({
         await track.restartTrack({
           noiseSuppression: noiseCancellationEnabled,
           autoGainControl: noiseCancellationEnabled,
-          echoCancellation: true,
-          processor: processorRef.current || undefined,
+          echoCancellation: true
         });
         if (!cancelled) {
           appliedNoiseCancellationRef.current = noiseCancellationEnabled;
@@ -260,9 +259,8 @@ function AudioRoomView({
               {sortedParticipants.map((participant) => (
                 <li
                   key={participant.identity}
-                  className={`flex items-center justify-between rounded-lg px-3 py-2 transition-colors ${
-                    participant.isSpeaking ? 'bg-blue-600/40' : 'bg-gray-900/60'
-                  }`}
+                  className={`flex items-center justify-between rounded-lg px-3 py-2 transition-colors ${participant.isSpeaking ? 'bg-blue-600/40' : 'bg-gray-900/60'
+                    }`}
                 >
                   <span className="font-medium">
                     {participant.name ?? participant.identity}
@@ -292,14 +290,12 @@ function AudioRoomView({
                 onChange={handleNoiseCancellationChange}
               />
               <span
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  noiseCancellationEnabled ? 'bg-blue-500' : 'bg-gray-600'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${noiseCancellationEnabled ? 'bg-blue-500' : 'bg-gray-600'
+                  }`}
               >
                 <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                    noiseCancellationEnabled ? 'translate-x-5' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${noiseCancellationEnabled ? 'translate-x-5' : 'translate-x-1'
+                    }`}
                 />
               </span>
             </label>

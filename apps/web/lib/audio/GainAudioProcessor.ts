@@ -26,7 +26,8 @@ export class GainAudioProcessor implements TrackProcessor<Track.Kind.Audio, Audi
   // restart runs whenever LiveKit swaps out the source track (e.g. device change).
   async restart(options: AudioProcessorOptions) {
     this.teardown();
-    this.context = options.audioContext;
+    // Livekit may not provide a new AudioContext on restart, so fall back to the existing one.
+    this.context = (options.audioContext || this.context);
     this.setupNodes(options.track);
   }
 
