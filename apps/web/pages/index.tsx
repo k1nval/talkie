@@ -27,13 +27,12 @@ export default function Home() {
   return (
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center gap-6">
       <h1 className="text-3xl font-bold">Выберите комнату</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-wrap justify-center gap-6">
         {rooms.map((room) => (
           <button
             key={room.name}
             onClick={() => handleJoin(room)}
-            style={{ height: '100px', width: '100%', margin: '10px' }}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 h-24 w-48"
           >
             <div className="text-lg font-semibold">{room.name}</div>
             <div className="text-sm text-blue-100 mt-1">{room.type === 'Audio' ? 'Аудио' : 'Видео'}</div>
