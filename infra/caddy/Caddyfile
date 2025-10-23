@@ -16,6 +16,11 @@
 {$TALKIE_DOMAIN} {
     encode gzip
 
+    # Remove Content-Security-Policy so we can test without CSP headers.
+    header {
+        -Content-Security-Policy
+    }
+
     reverse_proxy web:3000
 
     # Access log for this site
@@ -28,6 +33,10 @@
 
 # API
 {$API_TALKIE_DOMAIN} {
+    header {
+        -Content-Security-Policy
+    }
+
     reverse_proxy api:3001
 
     log {
@@ -39,6 +48,10 @@
 
 # LiveKit WS/HTTP
 {$LIVEKIT_TALKIE_DOMAIN} {
+    header {
+        -Content-Security-Policy
+    }
+
     reverse_proxy livekit:7880
 
     log {
