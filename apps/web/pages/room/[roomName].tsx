@@ -263,7 +263,7 @@ function AudioRoomView({
                     }`}
                 >
                   <span className="font-medium">
-                    {participant.name ?? participant.identity}
+                    {participant.identity}
                     {participant.isLocal ? ' (Вы)' : ''}
                   </span>
                   {participant.isSpeaking && (
