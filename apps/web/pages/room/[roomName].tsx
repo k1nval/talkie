@@ -11,21 +11,11 @@ import {
   useParticipants,
   useTracks,
 } from '@livekit/components-react';
-import type { TrackReference } from '@livekit/components-core';
-import type { Participant } from 'livekit-client';
 import { LocalAudioTrack, Track } from 'livekit-client';
 import { useRouter } from 'next/router';
-import {
-  ChangeEvent,
-  CSSProperties,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import { TrackReference } from '@livekit/components-core';
 import { GainAudioProcessor } from '../../lib/audio/GainAudioProcessor';
-import { useRemoteParticipantAudio } from '../../lib/audio/useRemoteParticipantAudio';
 
 type RoomType = 'Video' | 'Audio';
 
@@ -113,250 +103,6 @@ function MyVideoConference({ pinnedTrack }: MyVideoConferenceProps) {
   );
 }
 
-interface AudioRoomHeaderProps {
-  roomName: string;
-  participantName: string | null;
-  participantCount: number;
-}
-
-/**
- * Presents the room title and attendance stats so the main layout stays tidy.
- */
-function AudioRoomHeader({ roomName, participantName, participantCount }: AudioRoomHeaderProps) {
-  return (
-    <header className="space-y-1">
-      <h2 className="text-2xl font-semibold">Комната: {roomName}</h2>
-      {participantName && <p className="text-sm text-gray-300">Вы вошли как {participantName}</p>}
-      <p className="text-sm text-gray-400">Участников: {participantCount}</p>
-    </header>
-  );
-}
-
-interface ParticipantListProps {
-  participants: Participant[];
-  volumes: Record<string, number>;
-  onVolumeChange: (identity: string, volume: number) => void;
-}
-
-/**
- * Renders every attendee with optional per-participant gain sliders for remote voices.
- */
-function ParticipantList({ participants, volumes, onVolumeChange }: ParticipantListProps) {
-  if (participants.length === 0) {
-    return (
-      <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4">
-        <h3 className="text-lg font-semibold mb-3">Участники</h3>
-        <p className="text-sm text-gray-400">Пока никого нет</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4">
-      <h3 className="text-lg font-semibold mb-3">Участники</h3>
-      <ul className="space-y-2">
-        {participants.map((participant) => (
-          <ParticipantRow
-            key={participant.identity}
-            participant={participant}
-            volume={volumes[participant.identity] ?? 1}
-            onVolumeChange={onVolumeChange}
-          />
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-interface ParticipantRowProps {
-  participant: Participant;
-  volume: number;
-  onVolumeChange: (identity: string, volume: number) => void;
-}
-
-/**
- * Keeps the participant card compact while exposing a gain slider for remote voices.
- */
-function ParticipantRow({ participant, volume, onVolumeChange }: ParticipantRowProps) {
-  const displayName = participant.name ?? participant.identity;
-  const isLocal = participant.isLocal;
-
-  return (
-    <li
-      className={`flex flex-col gap-3 rounded-lg px-3 py-2 transition-colors sm:flex-row sm:items-center sm:justify-between ${
-        participant.isSpeaking ? 'bg-blue-600/40' : 'bg-gray-900/60'
-      }`}
-    >
-      <div className="flex items-center justify-between gap-2 sm:gap-3">
-        <span className="font-medium">
-          {displayName}
-          {isLocal ? ' (Вы)' : ''}
-        </span>
-        {participant.isSpeaking && (
-          <span className="text-xs uppercase tracking-wider text-blue-200">Говорит</span>
-        )}
-      </div>
-      {!isLocal && (
-        <ParticipantVolumeSlider
-          identity={participant.identity}
-          volume={volume}
-          onVolumeChange={onVolumeChange}
-        />
-      )}
-    </li>
-  );
-}
-
-interface ParticipantVolumeSliderProps {
-  identity: string;
-  volume: number;
-  onVolumeChange: (identity: string, volume: number) => void;
-}
-
-/**
- * Slider component that reports gain changes back to the mixer hook.
- */
-function ParticipantVolumeSlider({ identity, volume, onVolumeChange }: ParticipantVolumeSliderProps) {
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onVolumeChange(identity, Number(event.target.value));
-    },
-    [identity, onVolumeChange],
-  );
-
-  return (
-    <div className="flex w-full items-center gap-3 sm:w-64">
-      <label className="text-xs font-medium text-gray-400" htmlFor={`volume-${identity}`}>
-        {Math.round(volume * 100)}%
-      </label>
-      <input
-        id={`volume-${identity}`}
-        type="range"
-        min={0}
-        max={2}
-        step={0.05}
-        value={volume}
-        onChange={handleChange}
-        className="flex-1 accent-blue-500"
-        aria-label="Громкость участника"
-      />
-    </div>
-  );
-}
-
-interface AudioSettingsPanelProps {
-  inputVolume: number;
-  onInputVolumeChange: (value: number) => void;
-  noiseCancellationEnabled: boolean;
-  onNoiseCancellationToggle: (enabled: boolean) => void;
-  devices: MediaDeviceInfo[];
-  canChangeDevice: boolean;
-  currentDeviceId: string;
-  onDeviceChange: (deviceId: string) => void;
-}
-
-/**
- * Groups microphone controls so the audio room stays approachable for new users.
- */
-function AudioSettingsPanel({
-  inputVolume,
-  onInputVolumeChange,
-  noiseCancellationEnabled,
-  onNoiseCancellationToggle,
-  devices,
-  canChangeDevice,
-  currentDeviceId,
-  onDeviceChange,
-}: AudioSettingsPanelProps) {
-  const handleVolumeChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onInputVolumeChange(Number(event.target.value));
-    },
-    [onInputVolumeChange],
-  );
-
-  const handleNoiseChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onNoiseCancellationToggle(event.target.checked);
-    },
-    [onNoiseCancellationToggle],
-  );
-
-  const handleDeviceChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      onDeviceChange(event.target.value);
-    },
-    [onDeviceChange],
-  );
-
-  return (
-    <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h3 className="text-sm font-semibold text-gray-200">Шумоподавление</h3>
-          <p className="text-xs text-gray-400">Использует встроенную фильтрацию браузера.</p>
-        </div>
-        <label className="inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            className="sr-only"
-            checked={noiseCancellationEnabled}
-            onChange={handleNoiseChange}
-          />
-          <span
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              noiseCancellationEnabled ? 'bg-blue-500' : 'bg-gray-600'
-            }`}
-          >
-            <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                noiseCancellationEnabled ? 'translate-x-5' : 'translate-x-1'
-              }`}
-            />
-          </span>
-        </label>
-      </div>
-      <div>
-        <label className="flex items-center justify-between text-sm font-medium text-gray-200">
-          <span>Громкость микрофона</span>
-          <span>{Math.round(inputVolume * 100)}%</span>
-        </label>
-        <input
-          type="range"
-          min={0}
-          max={2}
-          step={0.05}
-          value={inputVolume}
-          onChange={handleVolumeChange}
-          className="mt-2 w-full accent-blue-500"
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium text-gray-200" htmlFor="audio-input-select">
-          Устройство ввода
-        </label>
-        <select
-          id="audio-input-select"
-          className="mt-2 w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={canChangeDevice ? currentDeviceId : ''}
-          onChange={handleDeviceChange}
-          disabled={!canChangeDevice}
-        >
-          {canChangeDevice ? (
-            devices.map((device, index) => (
-              <option key={device.deviceId || device.label || index} value={device.deviceId || 'default'}>
-                {device.label || `Микрофон ${index + 1}`}
-              </option>
-            ))
-          ) : (
-            <option value="">Нет доступных устройств</option>
-          )}
-        </select>
-      </div>
-    </div>
-  );
-}
-
 interface AudioRoomViewProps {
   roomName: string;
   participantName: string | null;
@@ -374,14 +120,6 @@ function AudioRoomView({
   const { microphoneTrack } = useLocalParticipant();
   // LiveKit hook gives us the available audio input devices and lets us switch between them.
   const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({ kind: 'audioinput' });
-  const microphoneTracks = useTracks([{ source: Track.Source.Microphone }]);
-  const remoteMicrophoneTracks = useMemo(
-    () => microphoneTracks.filter((trackRef) => !trackRef.participant.isLocal),
-    [microphoneTracks],
-  );
-  const { volumes: playbackVolumes, setVolume: setParticipantPlaybackVolume } = useRemoteParticipantAudio(
-    remoteMicrophoneTracks,
-  );
   const [inputVolume, setInputVolume] = useState(1);
   const volumeRef = useRef(inputVolume);
   const processorRef = useRef<GainAudioProcessor | null>(null);
@@ -487,60 +225,122 @@ function AudioRoomView({
   const currentDeviceId = activeDeviceId && activeDeviceId !== '' ? activeDeviceId : 'default';
   const canChangeDevice = devices.length > 0;
 
-  const handleDeviceChange = useCallback(
-    async (deviceId: string) => {
-      try {
-        await setActiveMediaDevice(deviceId);
-      } catch (error) {
-        console.error('Failed to switch audio input device', error);
-      }
-    },
-    [setActiveMediaDevice],
-  );
+  const handleDeviceChange = async (event: ChangeEvent<HTMLSelectElement>) => {
+    const deviceId = event.target.value;
+    try {
+      await setActiveMediaDevice(deviceId);
+    } catch (error) {
+      console.error('Failed to switch audio input device', error);
+    }
+  };
 
-  const handleInputVolumeChange = useCallback((value: number) => {
-    setInputVolume(value);
-  }, []);
+  const handleVolumeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputVolume(Number(event.target.value));
+  };
 
-  const handleNoiseCancellationChange = useCallback(
-    (enabled: boolean) => {
-      onNoiseCancellationToggle(enabled);
-    },
-    [onNoiseCancellationToggle],
-  );
-
-  const handleParticipantVolumeChange = useCallback(
-    (identity: string, value: number) => {
-      setParticipantPlaybackVolume(identity, value);
-    },
-    [setParticipantPlaybackVolume],
-  );
+  const handleNoiseCancellationChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onNoiseCancellationToggle(event.target.checked);
+  };
 
   const participantCount = participants.length;
 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 bg-gray-900 text-white p-6 overflow-y-auto w-full">
       <div className="w-full max-w-3xl flex flex-col gap-6">
-        <AudioRoomHeader
-          roomName={roomName}
-          participantName={participantName}
-          participantCount={participantCount}
-        />
-        <ParticipantList
-          participants={sortedParticipants}
-          volumes={playbackVolumes}
-          onVolumeChange={handleParticipantVolumeChange}
-        />
-        <AudioSettingsPanel
-          inputVolume={inputVolume}
-          onInputVolumeChange={handleInputVolumeChange}
-          noiseCancellationEnabled={noiseCancellationEnabled}
-          onNoiseCancellationToggle={handleNoiseCancellationChange}
-          devices={devices}
-          canChangeDevice={canChangeDevice}
-          currentDeviceId={currentDeviceId}
-          onDeviceChange={handleDeviceChange}
-        />
+        <header className="space-y-1">
+          <h2 className="text-2xl font-semibold">Комната: {roomName}</h2>
+          {participantName && <p className="text-sm text-gray-300">Вы вошли как {participantName}</p>}
+          <p className="text-sm text-gray-400">Участников: {participantCount}</p>
+        </header>
+        <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4">
+          <h3 className="text-lg font-semibold mb-3">Участники</h3>
+          {sortedParticipants.length > 0 ? (
+            <ul className="space-y-2">
+              {sortedParticipants.map((participant) => (
+                <li
+                  key={participant.identity}
+                  className={`flex items-center justify-between rounded-lg px-3 py-2 transition-colors ${
+                    participant.isSpeaking ? 'bg-blue-600/40' : 'bg-gray-900/60'
+                  }`}
+                >
+                  <span className="font-medium">
+                    {participant.name ?? participant.identity}
+                    {participant.isLocal ? ' (Вы)' : ''}
+                  </span>
+                  {participant.isSpeaking && (
+                    <span className="text-xs uppercase tracking-wider text-blue-200">Говорит</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-400">Пока никого нет</p>
+          )}
+        </div>
+        <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-200">Шумоподавление</h3>
+              <p className="text-xs text-gray-400">Использует встроенную фильтрацию браузера.</p>
+            </div>
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={noiseCancellationEnabled}
+                onChange={handleNoiseCancellationChange}
+              />
+              <span
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  noiseCancellationEnabled ? 'bg-blue-500' : 'bg-gray-600'
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    noiseCancellationEnabled ? 'translate-x-5' : 'translate-x-1'
+                  }`}
+                />
+              </span>
+            </label>
+          </div>
+          <div>
+            <label className="flex items-center justify-between text-sm font-medium text-gray-200">
+              <span>Громкость микрофона</span>
+              <span>{Math.round(inputVolume * 100)}%</span>
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={2}
+              step={0.05}
+              value={inputVolume}
+              onChange={handleVolumeChange}
+              className="mt-2 w-full accent-blue-500"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-200" htmlFor="audio-input-select">
+              Устройство ввода
+            </label>
+            <select
+              id="audio-input-select"
+              className="mt-2 w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={canChangeDevice ? currentDeviceId : ''}
+              onChange={handleDeviceChange}
+              disabled={!canChangeDevice}
+            >
+              {canChangeDevice ? (
+                devices.map((device, index) => (
+                  <option key={device.deviceId || device.label || index} value={device.deviceId || 'default'}>
+                    {device.label || `Микрофон ${index + 1}`}
+                  </option>
+                ))
+              ) : (
+                <option value="">Нет доступных устройств</option>
+              )}
+            </select>
+          </div>
+        </div>
         <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4">
           <ControlBar
             controls={{ microphone: true, camera: false, screenShare: false, chat: false, leave: true }}
@@ -664,7 +464,7 @@ export default function RoomPage() {
           onNoiseCancellationToggle={(enabled) => setNoiseCancellationEnabled(enabled)}
         />
       )}
-      {roomType === 'Video' ? <RoomAudioRenderer /> : null}
+      <RoomAudioRenderer />
     </LiveKitRoom>
   );
 }
