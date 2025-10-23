@@ -30,6 +30,6 @@ exec turnserver \
   --min-port=29000 \
   --max-port=29200 \
   --tls-listening-port=443 \
-  --external-ip=65.109.242.173 \
+  --external-ip=46.62.140.249 \
   --cert="${CERT_FILE}" \
   --pkey="${KEY_FILE}"
