@@ -21,7 +21,16 @@
         -Content-Security-Policy
     }
 
-    reverse_proxy web:3000
+    route {
+        # Proxy Next.js build assets through a friendlier /static prefix to
+        # avoid exposing /_next directly.
+        handle_path /static/_next/* {
+            uri strip_prefix /static
+            reverse_proxy web:3000
+        }
+
+        reverse_proxy web:3000
+    }
 
     # Access log for this site
     log {
