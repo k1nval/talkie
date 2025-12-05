@@ -4,6 +4,7 @@ services:
     build:
       context: ../
       dockerfile: infra/docker/node-api.Dockerfile
+    container_name: talkie-api
     environment:
       - PORT=3001
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
@@ -14,7 +15,7 @@ services:
       - "3001"
     restart: unless-stopped
     networks:
-      - talkie-net
+      - proxy
 
   web:
     build:
@@ -22,23 +23,26 @@ services:
       dockerfile: infra/docker/node-web.Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=https://${API_TALKIE_DOMAIN}
+    container_name: talkie-web
     env_file:
       - .env
     expose:
       - "3000"
     restart: unless-stopped
     networks:
-      - talkie-net
+      - proxy
 
   redis:
     image: redis:7-alpine
+    container_name: talkie-redis
     restart: unless-stopped
     networks:
-      - talkie-net
+      - proxy
 
   livekit:
     image: livekit/livekit-server:latest
-    command: ["--config", "/etc/livekit/livekit.yaml"]
+    container_name: talkie-livekit
+    command: [ "--config", "/etc/livekit/livekit.yaml" ]
     env_file: .env
     environment:
       LIVEKIT_KEYS: '${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}'
@@ -56,30 +60,8 @@ services:
     depends_on:
       - redis
     networks:
-      - talkie-net
-
-  caddy:
-    image: caddy:2.8
-    depends_on:
-      - web
-      - api
-      - livekit
-    env_file: .env
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-    ports:
-      - "46.62.140.249:80:80/tcp"
-      - "46.62.140.249:443:443/tcp"
-      - "46.62.140.249:443:443/udp"
-    restart: unless-stopped
-    networks:
-      - talkie-net
-
-volumes:
-  caddy_data:
-
+      - proxy
 
 networks:
-  talkie-net:
-    driver: bridge
+  proxy:
+    external: true
